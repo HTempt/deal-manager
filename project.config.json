@@ -1,0 +1,15 @@
+{
+  "appid": "touristappid",
+  "projectname": "genke",
+  "compileType": "miniprogram",
+  "miniprogramRoot": "miniprogram/",
+  "setting": {
+    "es6": true,
+    "enhance": true,
+    "postcss": true,
+    "minified": true,
+    "urlCheck": false,
+    "checkInvalidKey": true,
+    "useCompilerPlugins": ["typescript"]
+  }
+}

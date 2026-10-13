@@ -1,0 +1,37 @@
+<view class="page ai-page">
+  <view class="ai-head"><view class="spark">✦</view><view><view class="ai-title">{{scenario==='唤醒客户'?'AI客户唤醒':'AI跟进助手'}}</view></view></view>
+  <view wx:if="{{loading}}" class="loading">正在加载客户资料…</view>
+  <view wx:elif="{{loadError}}" class="empty"><view>{{loadError}}</view><button class="ghost-btn" bindtap="loadCustomer">重试</button></view>
+  <block wx:else>
+    <view class="context" wx:if="{{customer}}">
+      <view class="context-name">{{customer.name}} <text>{{customer.stage}}</text></view>
+      <view class="context-row"><text>客户需求</text><text>{{customer.need}}</text></view>
+      <view class="context-row"><text>预计金额</text><text>{{customer.budget ? '¥'+customer.budget : '未填写'}}</text></view>
+      <view class="context-row"><text>最近反馈</text><text>{{lastFeedback}}</text></view>
+      <view wx:if="{{scenario==='唤醒客户'}}" class="context-row"><text>{{customer.hasContactHistory?'距上次联系':'尚未跟进'}}</text><text>{{customer.hasContactHistory?customer.daysWithoutFollow+' 天':'创建已 '+(customer.daysWithoutFollow||0)+' 天'}}</text></view>
+    </view>
+    <view class="section-title">跟进场景</view>
+    <view class="scenario-grid"><view wx:for="{{scenarios}}" wx:key="*this" class="scenario {{scenario===item?'active':''}}" data-value="{{item}}" bindtap="choose">{{item}}</view></view>
+    <button wx:if="{{!result}}" class="primary-btn generate" loading="{{generating}}" disabled="{{generating}}" bindtap="generate">{{generating?'正在分析…':scenario==='唤醒客户'?'AI生成唤醒话术':'AI生成话术'}}</button>
+    <view wx:if="{{generationError}}" class="generation-error">{{generationError}}</view>
+    <view class="result" wx:if="{{result}}">
+      <view class="result-label"><text>AI 建议</text><text>{{result.unlimited ? 'VIP 无限使用' : '今日剩余 ' + result.remainingToday + ' 次'}}</text></view>
+      <view class="advice-section"><view class="advice-label">{{scenario==='唤醒客户'?'为什么现在值得联系？':'当前判断'}}</view><text class="advice-text">{{result.assessment || result.reason}}</text></view>
+      <view class="advice-section"><view class="advice-label">{{scenario==='唤醒客户'?'推荐唤醒方式':'建议动作'}}</view><text class="advice-text">{{result.suggestedAction || result.nextAction}}</text></view>
+      <view class="advice-section"><view class="advice-label">推荐话术</view><text class="advice-text script">{{result.content}}</text>
+        <view class="result-actions">
+          <button class="ghost-btn" loading="{{generating}}" disabled="{{generating||scheduling}}" bindtap="generate" data-action="REGENERATE">换一种说法</button>
+          <button class="ghost-btn" disabled="{{generating||scheduling}}" bindtap="generate" data-action="SHORTEN">精简话术</button>
+          <button class="primary-btn" disabled="{{generating}}" bindtap="copy">复制话术</button>
+        </view>
+      </view>
+      <view class="advice-section next-follow">
+        <view class="advice-label">下一次跟进</view>
+        <view wx:if="{{result.followUpDays}}" class="follow-interval">建议 {{result.followUpDays}} 天后 · {{nextFollowDisplay}}</view>
+        <text class="advice-text">{{result.followUpReason}}</text>
+        <button wx:if="{{result.nextFollowTime&&customer.status==='ACTIVE'}}" class="primary-btn adopt" bindtap="adoptFollowUp" loading="{{scheduling}}" disabled="{{generating||scheduling||adopted}}">{{adopted?'已采用此安排':'采用跟进时间'}}</button>
+      </view>
+    </view>
+    <view class="notice">AI 建议仅供参考，发送前请确认客户信息。</view>
+  </block>
+</view>

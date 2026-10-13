@@ -1,0 +1,26 @@
+<view class="page follow-page">
+  <view class="head"><view><view class="page-heading">跟进任务</view><view class="subtitle">待跟进计划</view></view><view class="total">{{total}}</view></view>
+  <view class="switch">
+    <view class="switch-item {{active==='overdue'?'active danger':''}}" data-tab="overdue" bindtap="tab"><text class="switch-label">逾期</text><text class="switch-count">{{overdue.length}}</text></view>
+    <view class="switch-item {{active==='today'?'active':''}}" data-tab="today" bindtap="tab"><text class="switch-label">今日</text><text class="switch-count">{{today.length}}</text></view>
+    <view class="switch-item {{active==='upcoming'?'active':''}}" data-tab="upcoming" bindtap="tab"><text class="switch-label">即将跟进</text><text class="switch-count">{{upcoming.length}}</text></view>
+  </view>
+  <view class="unscheduled-link" bindtap="goUnscheduled">待安排客户 ›</view>
+  <view wx:if="{{loading}}" class="loading">正在加载…</view>
+  <view wx:elif="{{loadError}}" class="empty"><view>{{loadError}}</view><button class="ghost-btn retry" bindtap="load">重试</button></view>
+  <block wx:elif="{{groups.length}}">
+    <block wx:for="{{groups}}" wx:for-item="group" wx:key="key">
+      <view class="date-label"><text>{{group.label}}</text><text>{{group.tasks.length}} 个任务</text></view>
+      <view class="task card" wx:for="{{group.tasks}}" wx:key="taskId" bindtap="detail" data-id="{{item.customerId}}">
+        <view class="task-bar {{active==='overdue'?'red':''}}"></view>
+        <view class="task-content">
+          <view class="task-head"><view class="task-identity"><text class="name">{{item.customerName}}</text><text class="stage">{{item.stage}}</text></view><text class="amount" wx:if="{{item.budgetText !== '0'}}">¥{{item.budgetText}}</text><text class="amount muted" wx:else>预算未设置</text></view>
+          <view class="task-title">{{item.title}}</view>
+          <view class="plan-date {{active==='overdue'?'overdue':''}}">{{active==='overdue'?'原定 ':''}}{{item.planDate}}<text wx:if="{{active==='overdue'}}"> · 已逾期 {{item.overdueDays}} 天</text></view>
+          <view class="actions"><button catchtap="ai" data-id="{{item.customerId}}" class="ghost-btn">AI跟进助手</button><button catchtap="record" data-id="{{item.customerId}}" data-task="{{item.taskId}}" class="primary-btn">{{active==='upcoming'?'记录跟进':'立即跟进'}}</button></view>
+        </view>
+      </view>
+    </block>
+  </block>
+  <view wx:else class="empty"><view class="empty-icon">✓</view><view>{{active==='today'?'今天没有待办任务':(active==='overdue'?'没有逾期任务':'暂无未来跟进任务')}}</view></view>
+</view>

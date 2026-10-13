@@ -1,0 +1,87 @@
+<view class="page home-page">
+  <view class="top-safe"></view>
+  <view class="page-heading">今天也要好好跟客</view>
+  <view class="summary"><block wx:if="{{overview.customerCount === 0}}">当前您暂时无客户</block><block wx:elif="{{advice.items.length > 0}}">今天建议重点跟进 <text>{{advice.items.length}}</text> 位客户</block><block wx:elif="{{overview.todayTasks.length > 0}}">已为您选出 <text>{{overview.todayTasks.length}}</text> 位今天值得优先跟进的客户</block><block wx:elif="{{overview.unscheduledCount > 0}}">还有 <text>{{overview.unscheduledCount}}</text> 位客户没有安排下一次跟进</block><block wx:elif="{{overview.todayFollowCount > 0}}">当前您有 <text>{{overview.todayFollowCount}}</text> 位客户待处理</block><block wx:else>当前暂无到期待处理客户</block></view>
+
+  <view class="hero-card">
+    <view class="hero-orb"></view>
+    <view class="hero-title">今日行动</view>
+    <block wx:if="{{overview.todayFollowCount > 0}}">
+      <view class="hero-number">{{overview.todayFollowCount}}</view>
+      <view class="hero-unit">位客户待处理</view>
+      <button class="hero-button" bindtap="goPriority">开始跟进 →</button>
+    </block>
+    <block wx:elif="{{overview.todayTasks.length > 0}}">
+      <view class="hero-empty-title">{{overview.todayTasks.length}} 位客户值得跟进</view>
+      <view class="hero-empty-copy">抓住跟进时机，推进有价值的机会</view>
+      <button class="hero-button" bindtap="goPriority">查看推荐 →</button>
+    </block>
+    <block wx:elif="{{overview.unscheduledCount > 0}}">
+      <view class="hero-empty-title">{{overview.unscheduledCount}} 位客户待安排</view>
+      <view class="hero-empty-copy">尚未安排下一次跟进</view>
+      <button class="hero-button" bindtap="goCustomers" data-filter="UNSCHEDULED">安排跟进 →</button>
+    </block>
+    <block wx:elif="{{overview.customerCount > 0}}">
+      <view class="hero-empty-title">今天暂无待处理客户</view>
+      <view class="hero-empty-copy">当前有 {{overview.customerCount}} 位客户</view>
+      <button class="hero-button" bindtap="goCustomers">查看客户 →</button>
+    </block>
+    <block wx:else>
+      <view class="hero-empty-title">暂时还没有客户</view>
+      <view class="hero-empty-copy">添加客户后，今日行动会显示在这里</view>
+      <button class="hero-button" bindtap="goCustomers">添加客户 →</button>
+    </block>
+  </view>
+
+  <view class="metric-row">
+    <view class="metric card" bindtap="goFollow" data-tab="overdue">
+      <view class="metric-icon overdue-icon">!</view><view><text class="metric-num">{{overview.overdueCount}}</text><text class="metric-label">逾期客户</text></view>
+    </view>
+    <view class="metric card" bindtap="goFollow" data-tab="today">
+      <view class="metric-icon today-icon">◷</view><view><text class="metric-num">{{overview.todayScheduledCount}}</text><text class="metric-label">今日待跟进</text></view>
+    </view>
+    <view class="metric card" bindtap="goCustomers" data-filter="UNSCHEDULED">
+      <view class="metric-icon unscheduled-icon">+</view><view><text class="metric-num">{{overview.unscheduledCount}}</text><text class="metric-label">待安排</text></view>
+    </view>
+    <view class="metric card" bindtap="goCustomers" data-filter="HIGH">
+      <view class="metric-icon high-icon">↑</view><view><text class="metric-num">{{overview.highIntentCount}}</text><text class="metric-label">高意向客户</text></view>
+    </view>
+  </view>
+
+  <view class="dormant-entry" bindtap="goCustomers" data-filter="DORMANT_ALL"><text>沉睡客户</text><view><text class="dormant-count">{{overview.dormantCount}}</text><text> ›</text></view></view>
+
+  <view class="section-head" id="daily-advice"><text class="section-title">今日建议</text><text class="all" bindtap="refreshAdvice">{{advice.loading ? '生成中…' : '重新生成建议'}}</text></view>
+  <view class="priority-hint">AI 根据意向、金额、最近联系时间、客户阶段、历史反馈、是否逾期和沉睡情况生成</view>
+  <block wx:if="{{advice.loading}}"><view class="task-card card"><view class="skeleton sk1"></view><view class="skeleton sk2"></view></view></block>
+  <block wx:else>
+    <view wx:if="{{advice.error}}" class="empty card advice-error"><view>{{advice.error}}</view><button class="ghost-btn retry-btn" bindtap="retryAdvice">重新加载</button></view>
+    <view class="advice-overview card" wx:if="{{advice.overview}}">
+      <view class="advice-overview-title">今日建议<text wx:if="{{advice.items.length}}" class="advice-count"> · 重点 {{advice.items.length}} 位</text></view>
+      <view class="advice-overview-text">{{advice.overview}}</view>
+      <view class="advice-meta" wx:if="{{advice.updatedText || advice.stale || advice.candidateCount}}"><text wx:if="{{advice.candidateCount}}">候选 {{advice.candidateCount}} 位</text><text wx:if="{{advice.updatedText}}">{{advice.updatedText}}</text><text wx:if="{{advice.stale}}" class="advice-stale">客户数据已更新，可重新生成</text></view>
+    </view>
+    <view class="task-card card" wx:for="{{advice.items}}" wx:key="customerId" bindtap="goDetail" data-id="{{item.customerId}}">
+      <view class="task-top">
+        <view class="priority-badge {{item.priorityClass}}">{{item.priority}}</view>
+        <view class="task-main"><view class="name-line"><text class="name">{{item.customerName}}</text><text class="intent" wx:if="{{item.intentionScore >= 70}}">高意向</text></view><view class="desc">{{item.stage || '阶段待确认'}} · {{item.contactText}}<text wx:if="{{item.overdueText}}"> · {{item.overdueText}}</text></view></view>
+        <view class="amount">{{item.budgetText}}</view>
+      </view>
+      <view class="advice-text">{{item.advice}}</view>
+      <view class="task-actions"><button catchtap="goAi" data-id="{{item.customerId}}" class="ghost-btn mini">AI跟进助手</button><button catchtap="goRecord" data-id="{{item.customerId}}" class="primary-btn mini">记录跟进</button></view>
+    </view>
+    <view wx:if="{{!advice.error && !advice.overview && !advice.items.length}}" class="empty card"><view>今天暂无需要重点跟进的客户</view></view>
+  </block>
+
+  <view class="section-head" id="priority-customers"><text class="section-title">今日最值得跟进</text><text class="all" bindtap="goFollow">全部任务 →</text></view>
+  <view class="priority-hint">综合客户意向、预计金额和跟进时机推荐</view>
+  <block wx:if="{{loading}}"><view class="task-card card"><view class="skeleton sk1"></view><view class="skeleton sk2"></view></view></block>
+  <view wx:elif="{{loadError}}" class="empty card"><view>{{loadError}}</view><button class="ghost-btn retry-btn" bindtap="load">重新加载</button></view>
+  <block wx:elif="{{overview.todayTasks.length}}">
+    <view class="task-card card" wx:for="{{overview.todayTasks}}" wx:key="customerId" bindtap="goDetail" data-id="{{item.customerId}}">
+      <view class="task-top"><view class="avatar">{{item.avatar}}</view><view class="task-main"><view class="name-line"><text class="name">{{item.customerName}}</text><text class="intent" wx:if="{{item.intentionScore >= 70}}">高意向</text></view><view class="desc">{{item.stage || '阶段待确认'}} · {{item.contactText}}</view></view><view class="amount">{{item.budgetText}}</view></view>
+      <view class="priority-reason" wx:if="{{item.reasonText}}"><text class="reason-label">推荐原因</text><text>{{item.reasonText}}</text></view>
+      <view class="task-actions"><button catchtap="goAi" data-id="{{item.customerId}}" class="ghost-btn mini">AI跟进助手</button><button catchtap="goRecord" data-id="{{item.customerId}}" data-task="{{item.taskId}}" class="primary-btn mini">记录跟进</button></view>
+    </view>
+  </block>
+  <view wx:else class="empty card"><view class="empty-icon">✓</view><view>{{overview.customerCount > 0 ? '今天暂无优先跟进推荐' : '添加客户后，为您推荐跟进机会'}}</view><view wx:if="{{overview.unscheduledCount > 0}}" class="empty-sub" bindtap="goCustomers" data-filter="UNSCHEDULED">还有 {{overview.unscheduledCount}} 位客户待安排 ›</view></view>
+</view>

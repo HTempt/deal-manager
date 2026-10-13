@@ -1,0 +1,1 @@
+ALTER TABLE customer ADD COLUMN tags JSON NULL AFTER source;

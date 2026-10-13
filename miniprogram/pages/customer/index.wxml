@@ -1,0 +1,37 @@
+<view class="page customer-page">
+  <view class="title-row"><view><view class="page-heading">我的客户</view><view class="subtitle">每一次联系，都别让客户被忘记</view></view><view class="add" bindtap="add">＋</view></view>
+  <view class="search"><text>⌕</text><input placeholder="搜索姓名、电话或需求" value="{{keyword}}" bindinput="search" /></view>
+  <scroll-view scroll-x class="tabs" enhanced show-scrollbar="{{false}}"><view class="tabs-inner"><view wx:for="{{tabs}}" wx:key="k" class="tab {{active===item.k?'active':''}}" data-key="{{item.k}}" bindtap="changeTab"><text>{{item.n}}</text><text class="tab-count">{{item.count}}</text></view></view></scroll-view>
+  <view class="unscheduled-note" wx:if="{{active==='UNSCHEDULED'&&!loading}}">{{total ? '还有 ' + total + ' 位客户没有安排下一次跟进' : '所有客户都已安排跟进'}}{{keyword ? '（当前搜索结果）' : ''}}</view>
+  <view class="dormancy-filters" wx:if="{{active==='DORMANT_ALL'}}"><view wx:for="{{dormancyFilters}}" wx:key="k" class="dormancy-filter {{dormancyFilter===item.k?'selected':''}}" data-key="{{item.k}}" bindtap="changeDormancy">{{item.n}}</view></view>
+  <block wx:if="{{loading}}">
+    <view class="card customer-card"><view class="skeleton sk"></view><view class="skeleton sk small"></view></view>
+  </block>
+  <view class="empty" wx:elif="{{loadError}}"><view>{{loadError}}</view><button class="ghost-btn" bindtap="load">重试</button></view>
+  <block wx:elif="{{list.length}}">
+    <view class="card customer-card" wx:for="{{list}}" wx:key="id">
+      <view class="customer-body" bindtap="detail" data-id="{{item.id}}">
+      <view class="avatar {{item.intentionScore>=70?'hot':''}}">{{item.avatar}}</view>
+      <view class="customer-main"><view class="customer-name">{{item.name}} <text wx:if="{{item.intentionScore>=70}}">{{item.intentText}}</text></view><view class="need">{{item.need}}</view><view class="customer-tags" wx:if="{{item.tags&&item.tags.length}}"><text class="tag-pill" wx:for="{{item.tags}}" wx:key="*this">{{item}}</text></view><view class="meta"><text class="money">¥{{item.budgetText}}</text><text>·</text><text>{{item.stage}}</text><text>·</text><text class="{{item.unscheduled?'unscheduled-label':''}}">{{item.unscheduled?'待安排':item.nextText}}</text></view></view>
+      <view class="chevron">›</view>
+      </view>
+      <view class="dormancy-row" wx:if="{{item.canWake}}"><view><view class="dormancy-label {{item.dormancyLevel}}">{{item.dormancyText}}</view><view class="inactivity">{{item.inactivityText}}</view></view><button class="ghost-btn wake-btn" data-id="{{item.id}}" catchtap="wake">AI 唤醒</button></view>
+      <view class="schedule-actions" wx:if="{{item.unscheduled}}">
+        <button class="ghost-btn" disabled="{{!!savingId}}" loading="{{savingId==item.id}}" data-id="{{item.id}}" data-days="1" catchtap="quickSchedule">明天跟进</button>
+        <button class="ghost-btn" disabled="{{!!savingId}}" data-id="{{item.id}}" data-days="3" catchtap="quickSchedule">3天后</button>
+        <button class="ghost-btn" disabled="{{!!savingId}}" data-id="{{item.id}}" data-name="{{item.name}}" catchtap="openCustom">自定义</button>
+      </view>
+    </view>
+  </block>
+  <block wx:else>
+    <view class="empty"><view class="empty-icon">♙</view><view>{{active==='UNSCHEDULED'?'暂无待安排客户':'还没有符合条件的客户'}}</view><button wx:if="{{!hasCustomers&&active==='ALL'&&!keyword}}" class="ghost-btn empty-btn" bindtap="add">添加第一位客户</button></view>
+  </block>
+  <view class="more-customers" wx:if="{{!loading&&hasMore}}"><view wx:if="{{loadMoreError}}">{{loadMoreError}}</view><button class="ghost-btn" bindtap="loadMore" loading="{{loadingMore}}" disabled="{{loadingMore}}">{{loadingMore?'正在加载…':'加载更多客户'}}</button></view>
+</view>
+<view class="schedule-mask" wx:if="{{customVisible}}" catchtap="closeCustom">
+  <view class="schedule-sheet" catchtap="noop">
+    <view class="schedule-title">安排跟进</view><view class="schedule-name">{{customName}}</view>
+    <view class="schedule-fields"><picker mode="date" start="{{minDate}}" value="{{customDate}}" bindchange="customDate"><view>{{customDate}}</view></picker><picker mode="time" value="{{customTime}}" bindchange="customTime"><view>{{customTime}}</view></picker></view>
+    <view class="schedule-footer"><button class="ghost-btn" disabled="{{!!savingId}}" bindtap="closeCustom">取消</button><button class="primary-btn" disabled="{{!!savingId}}" loading="{{!!savingId}}" bindtap="confirmCustom">确认安排</button></view>
+  </view>
+</view>

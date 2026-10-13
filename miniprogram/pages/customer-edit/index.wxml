@@ -1,0 +1,23 @@
+<view class="page edit-page">
+  <view class="form-card">
+    <view class="field"><text class="field-label required">客户姓名</text><input class="input" placeholder="例如：张先生（仅中文、字母或数字）" data-key="name" value="{{form.name}}" bindinput="input" maxlength="30" /></view>
+    <view class="field"><text class="field-label required">客户所在城市</text><input class="input" placeholder="例如：杭州市" data-key="city" value="{{form.city}}" bindinput="input" maxlength="50" /></view>
+    <view class="field"><text class="field-label">详细地址（选填）</text><input class="input" placeholder="例如：西湖区文三路 100 号" data-key="address" value="{{form.address}}" bindinput="input" maxlength="255" /></view>
+    <view class="field"><text class="field-label">手机号</text><input class="input" type="number" placeholder="便于快速联系客户" data-key="phone" value="{{form.phone}}" bindinput="input" maxlength="20" /></view>
+    <view class="field"><text class="field-label required">客户需求</text><textarea class="textarea" placeholder="简单描述客户想解决的问题" data-key="need" value="{{form.need}}" bindinput="input" maxlength="500" /></view>
+    <view class="field"><text class="field-label">预计金额（元）</text><input class="input" type="digit" placeholder="0.00" data-key="budget" value="{{form.budget}}" bindinput="input" /></view>
+    <picker range="{{sources}}" value="{{sourceIndex}}" bindchange="source"><view class="field"><text class="field-label">客户来源</text><view class="picker-value">{{sources[sourceIndex]}}<text>⌄</text></view></view></picker>
+    <view class="field tags-field"><view class="field-label-row"><text class="field-label">客户标签</text><text class="tags-count">{{form.tags.length}}/5</text></view>
+      <view class="tag-options"><button wx:for="{{tagOptions}}" wx:key="name" class="tag-option {{item.selected?'selected':''}}" data-tag="{{item.name}}" bindtap="toggleTag">{{item.name}}</button></view>
+      <view class="custom-tag-entry"><input class="input" placeholder="添加自定义标签" maxlength="20" value="{{customTag}}" bindinput="customTagInput" bindconfirm="addCustomTag" confirm-type="done" /><button class="ghost-btn add-tag" bindtap="addCustomTag">添加</button></view>
+    </view>
+    <picker range="{{stages}}" value="{{stageIndex}}" bindchange="stage"><view class="field"><text class="field-label">客户阶段</text><view class="picker-value">{{stages[stageIndex]}}<text>⌄</text></view></view></picker>
+    <view class="field"><text class="field-label">意向评分</text><view class="score-modes"><button class="score-mode {{intentionMode==='AUTO'?'active':''}}" data-mode="AUTO" bindtap="scoreMode">综合评分</button><button class="score-mode {{intentionMode==='MANUAL'?'active':''}}" data-mode="MANUAL" bindtap="scoreMode">人工评分</button></view>
+      <block wx:if="{{intentionMode==='MANUAL'}}"><view class="score-entry"><input type="number" maxlength="3" value="{{form.intentionScore}}" data-key="intentionScore" bindinput="input" /><text>/ 100</text></view><slider min="0" max="100" step="1" value="{{form.intentionScore}}" activeColor="#176B52" bindchange="scoreSlider" /></block>
+    </view>
+    <view class="field"><text class="field-label">安排下次跟进</text><switch color="#176B52" checked="{{followEnabled}}" bindchange="toggleFollow" /></view>
+    <view class="field" wx:if="{{followEnabled}}"><text class="field-label">下次跟进</text><view class="datetime"><picker mode="date" value="{{form.date}}" bindchange="date"><view>{{form.date}}</view></picker><picker mode="time" value="{{form.time}}" bindchange="time"><view>{{form.time}}</view></picker></view></view>
+  </view>
+  <view class="tip">{{followEnabled ? '保存后会自动生成一条跟进任务' : '保存后进入待安排客户'}}</view>
+  <button class="primary-btn save" loading="{{saving}}" bindtap="submit">保存客户</button>
+</view>

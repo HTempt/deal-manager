@@ -1,0 +1,74 @@
+<view class="page data-page">
+  <view class="title-row"><view><view class="page-heading">生意数据</view><view class="subtitle">看清转化，找到跟进缺口</view></view><picker mode="date" fields="month" value="{{month}}" bindchange="month"><view class="month">{{month}} ⌄</view></picker></view>
+
+  <view class="section-title overview-title">{{month}} 概况</view>
+  <view class="overview-grid">
+    <view class="card stat"><view class="stat-label">新增客户</view><view class="stat-value">{{overviewLoading || dataError ? '—' : overview.newCustomers}}</view><view wx:if="{{!overviewLoading && !dataError}}" class="stat-hint">{{overview.growthDisplay}}</view></view>
+    <view class="card stat"><view class="stat-label">报价客户</view><view class="stat-value">{{funnelLoading || funnelError ? '—' : funnel.quotedCustomers}}</view><view class="stat-hint">新增客户中已达到报价</view></view>
+    <view class="card stat"><view class="stat-label">成交客户</view><view class="stat-value">{{overviewLoading || dataError ? '—' : overview.dealCustomers}}</view><view class="stat-hint">按所选月成交日期计</view></view>
+    <view class="card stat amount-stat"><view class="stat-label">成交金额</view><view class="stat-value amount-value">{{overviewLoading || dataError ? '—' : overview.dealAmountDisplay}}</view><view class="stat-hint">所选月成交记录合计</view></view>
+  </view>
+  <view wx:if="{{dataError}}" class="data-error card"><text>{{dataError}}</text><button class="ghost-btn" bindtap="retryOverview">重试</button></view>
+
+  <view class="section-title">成交漏斗</view>
+  <view class="card conversion-card">
+    <view class="section-caption">{{month}} 新增客户 · 截至当前进展</view>
+    <view wx:if="{{funnelLoading}}" class="module-message">正在加载转化数据…</view>
+    <view wx:elif="{{funnelError}}" class="module-message"><text>{{funnelError}}</text><button class="ghost-btn retry-btn" bindtap="retryFunnel">重试</button></view>
+    <block wx:else>
+      <view class="metric-line"><view><view class="metric-label">咨询 → 报价</view><view class="metric-detail">{{funnel.quotedCustomers}} / {{funnel.stages[0].customers}} 位新增客户</view></view><text class="metric-value">{{funnel.inquiryToQuoteDisplay}}</text></view>
+      <view class="metric-line"><view><view class="metric-label">报价 → 成交</view><view class="metric-detail">{{funnel.stages[5].customers}} / {{funnel.quotedCustomers}} 位达到报价的客户</view></view><text class="metric-value">{{funnel.quoteToDealDisplay}}</text></view>
+      <view class="metric-line"><view><view class="metric-label">成交转化率</view><view class="metric-detail">{{funnel.stages[5].customers}} / {{funnel.stages[0].customers}} 位新增客户</view></view><text class="metric-value">{{funnel.dealConversionDisplay}}</text></view>
+      <view class="conversion-note">咨询按新增客户计；三项转化率均使用同一批客户。</view>
+      <view class="detail-toggle" bindtap="toggleFunnel">{{funnelExpanded ? '收起阶段明细 −' : '查看阶段明细 +'}}</view>
+      <view wx:if="{{funnelExpanded}}" class="funnel-details">
+        <view class="funnel-node" wx:for="{{funnel.stages}}" wx:key="stage"><view class="funnel-head"><text>{{item.stage}}</text><text class="funnel-count">{{item.customers}} 位</text></view><view class="funnel-track"><view class="funnel-bar {{index === 5 ? 'funnel-bar-deal' : ''}}" style="width:{{item.width}}%"></view></view><view wx:if="{{index < 5}}" class="funnel-arrow">↓</view></view>
+        <view class="funnel-loss">这批客户中已流失 {{funnel.lostCustomers}} 位</view>
+      </view>
+      <view wx:if="{{!funnel.stages[0].customers}}" class="module-message">所选月没有新增客户，暂无转化样本。</view>
+    </block>
+  </view>
+
+  <view class="section-title">跟进效率</view>
+  <view class="card efficiency-card">
+    <view class="section-caption">所选月已到期任务 · 截至当前完成情况</view>
+    <view wx:if="{{efficiencyLoading}}" class="module-message">正在加载跟进效率…</view>
+    <view wx:elif="{{efficiencyError}}" class="module-message"><text>{{efficiencyError}}</text><button class="ghost-btn retry-btn" bindtap="retryEfficiency">重试</button></view>
+    <block wx:else>
+      <view class="efficiency-totals"><view><view class="stat-label">应跟进</view><view class="efficiency-number">{{efficiency.expectedTasks}}<text> 项</text></view></view><view><view class="stat-label">已完成</view><view class="efficiency-number">{{efficiency.completedTasks}}<text> 项</text></view></view><view><view class="stat-label">完成率</view><view class="efficiency-number efficiency-rate">{{efficiency.completionDisplay}}</view></view></view>
+      <view class="completion-track"><view class="completion-bar" style="width:{{efficiency.completionWidth}}%"></view></view>
+      <view wx:if="{{efficiency.pendingTasks > 0}}" class="follow-gap">还有 {{efficiency.pendingTasks}} 项已到期任务未完成</view>
+      <view wx:elif="{{efficiency.expectedTasks > 0}}" class="follow-complete">这批已到期任务已全部完成</view>
+      <view wx:else class="conversion-note">所选月暂无已到期任务，完成率暂无样本。</view>
+      <view class="metric-line"><view><view class="metric-label">平均跟进次数</view><view class="metric-detail">{{efficiency.followRecords}} 条记录 / {{efficiency.followedCustomers}} 位当月联系客户</view></view><text class="metric-value average-value">{{efficiency.averageFollowDisplay}}</text></view>
+      <view class="metric-line"><view><view class="metric-label">平均成交周期</view><view class="metric-detail">{{efficiency.dealCycleCustomers}} 位所选月首次成交客户 · 从录入到成交</view></view><text class="metric-value average-value">{{efficiency.averageCycleDisplay}}</text></view>
+      <view wx:if="{{efficiency.asOfText}}" class="as-of">统计时间：{{efficiency.asOfText}}</view>
+    </block>
+  </view>
+
+  <view class="basis-toggle" bindtap="toggleBasis">统计口径 {{showBasis ? '−' : '+'}}</view>
+  <view wx:if="{{showBasis}}" class="basis-note">
+    <view>转化：仅统计所选月新增且未删除的同一批客户，截至当前的累计阶段进展；跳阶段计入前置阶段，阶段回退和流失保留已达到阶段。顶部成交客户与金额按成交日期统计，可能包含老客户。</view>
+    <view>跟进：计划日期在所选月、截至统计时间已到期的未取消任务，按任务数计；已完成包含后来补做的任务，不代表按时完成。取消任务和尚未到期的计划不计入。</view>
+    <view>平均次数：当月跟进记录数 / 当月实际联系客户数。成交周期：所选月首次成交客户从录入到首次成交的平均天数，重复成交不重复计入，缺失或倒置日期不计入样本。所有统计排除已删除客户，时间按北京时间计算。</view>
+    <view>无分母或有效样本时显示 —。旧已流失客户的历史阶段无法恢复。</view>
+  </view>
+
+  <view class="section-title">客户来源转化分析</view>
+  <view wx:if="{{sourceLoading}}" class="card module-message">正在加载客户来源…</view>
+  <view wx:elif="{{sourceError}}" class="card module-message"><text>{{sourceError}}</text><button class="ghost-btn retry-btn" bindtap="retrySources">重试</button></view>
+  <view class="card source-card" wx:elif="{{sources.length}}"><view class="source" wx:for="{{sources}}" wx:key="source"><view class="source-head"><text>{{item.source}}</text><text>{{item.newCustomers}} 位 · 成交 ¥{{item.dealAmountText}}</text></view><view class="bar-bg"><view class="bar" style="width:{{item.width}}%"></view></view></view></view>
+  <view wx:else class="empty card"><view class="empty-icon">↗</view><view>所选月暂无来源数据</view><view class="empty-sub">新增客户或记录成交后自动统计</view></view>
+
+  <view class="insight">
+    <view class="insight-icon">✦</view>
+    <view class="insight-content">
+      <view class="insight-header"><view class="insight-title">经营复盘<text class="ai-badge" wx:if="{{!summaryAiGenerated}}">暂无数据</text></view><button class="ghost-btn reanalyze" loading="{{summaryLoading}}" disabled="{{summaryLoading}}" bindtap="reanalyze">重新分析</button></view>
+      <text wx:if="{{summary}}">{{summary}}</text>
+      <text wx:if="{{summaryStale}}">分析口径或 AI 设置已更新，可重新分析</text>
+      <text class="summary-time" wx:if="{{summaryUpdatedAt}}">分析时间：{{summaryUpdatedAt}}</text>
+      <text wx:if="{{summaryLoading}}">正在生成经营复盘，请稍候…</text>
+      <block wx:if="{{summaryError}}"><text>{{summaryError}}</text><button class="ghost-btn summary-retry" bindtap="retrySummary">重试</button></block>
+    </view>
+  </view>
+</view>

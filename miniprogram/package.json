@@ -1,0 +1,9 @@
+{
+  "name": "deal-manager-miniprogram",
+  "private": true,
+  "version": "1.0.0",
+  "devDependencies": {
+    "miniprogram-api-typings": "^4.0.4",
+    "typescript": "^5.6.3"
+  }
+}

@@ -1,0 +1,13 @@
+<view class="page member-page">
+  <view class="crown">♢</view><view class="headline">让每次跟进更有价值</view><view class="sub">专业版 · 为认真经营的你准备</view>
+  <view class="price"><text>¥</text>29<text>/ 月</text></view>
+  <view class="plan card">
+    <view class="plan-row"><text>✓</text><view><view>不限客户数量</view><text>客户资产持续沉淀</text></view></view>
+    <view class="plan-row"><text>✓</text><view><view>AI跟进助手</view><text>生成、换一种说法、精简话术不限次数</text></view></view>
+    <view class="plan-row"><text>✓</text><view><view>高级经营分析</view><text>看清成交漏斗、客户来源转化和跟进效率</text></view></view>
+    <view class="plan-row"><text>✓</text><view><view>沉睡客户唤醒</view><text>不再错过潜在成交</text></view></view>
+  </view>
+  <button class="ghost-btn dormant-link" bindtap="dormantCustomers">查看沉睡客户</button>
+  <view class="agreement-row" bindtap="toggleAgreement"><view class="checkbox {{agreed?'checked':''}}">{{agreed?'✓':''}}</view><text>我已阅读并同意</text><text class="agreement-link" catchtap="showAgreement">《会员服务协议》</text></view>
+  <button class="primary-btn subscribe" bindtap="subscribe">立即开通专业版</button>
+</view>

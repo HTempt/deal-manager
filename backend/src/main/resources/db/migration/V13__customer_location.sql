@@ -1,0 +1,4 @@
+ALTER TABLE customer ADD COLUMN city VARCHAR(50) NULL AFTER name;
+UPDATE customer SET city = '未填写' WHERE city IS NULL OR TRIM(city) = '';
+ALTER TABLE customer MODIFY COLUMN city VARCHAR(50) NOT NULL;
+ALTER TABLE customer ADD COLUMN address VARCHAR(255) NULL AFTER city;

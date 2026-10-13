@@ -1,0 +1,6 @@
+# Local credentials and model provider keys must never enter the build context.
+ai-models*.json
+.env
+.env.*
+logs/
+target/

@@ -1,0 +1,35 @@
+page {
+  --green: #176b52;
+  --green-dark: #104d3d;
+  --mint: #dceee6;
+  --orange: #ed7a45;
+  --ink: #18211e;
+  --muted: #7c8581;
+  --line: #e8ebe6;
+  background: #f6f7f2;
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+  font-size: 28rpx;
+}
+.page { min-height: 100vh; box-sizing: border-box; padding: 28rpx 28rpx 60rpx; }
+.card { background: #fff; border-radius: 28rpx; padding: 28rpx; box-shadow: 0 8rpx 28rpx rgba(22, 51, 42, .055); }
+.section-title { font-size: 34rpx; font-weight: 700; margin: 36rpx 0 22rpx; }
+.muted { color: var(--muted); }
+.money { font-family: "DIN Alternate", sans-serif; font-weight: 700; }
+.primary-btn { background: var(--green); color: #fff; border-radius: 999rpx; font-weight: 600; font-size: 30rpx; }
+.primary-btn::after, .ghost-btn::after { border: 0; }
+.ghost-btn { background: var(--mint); color: var(--green-dark); border-radius: 999rpx; font-size: 27rpx; font-weight: 600; }
+.danger-btn { background: #fff1ed; color: #c95632; }
+.tag { display: inline-flex; align-items: center; padding: 7rpx 16rpx; background: #edf4f1; color: var(--green); border-radius: 999rpx; font-size: 23rpx; }
+.empty { padding: 100rpx 30rpx; text-align: center; color: var(--muted); }
+.empty-icon { font-size: 72rpx; margin-bottom: 16rpx; opacity: .55; }
+.form-card { background:#fff; border-radius:28rpx; padding: 6rpx 28rpx; }
+.field { padding: 26rpx 0; border-bottom: 1rpx solid var(--line); }
+.field:last-child { border-bottom: 0; }
+.field-label { display:block; color:#626a66; font-size:25rpx; margin-bottom:14rpx; }
+.required::after { content:' *'; color:var(--orange); }
+.input { font-size:30rpx; min-height:44rpx; }
+.textarea { width:100%; min-height:130rpx; font-size:29rpx; }
+.fixed-action { position: fixed; left: 28rpx; right: 28rpx; bottom: calc(30rpx + env(safe-area-inset-bottom)); z-index: 20; }
+.skeleton { background: linear-gradient(90deg,#eef0ec 25%,#f8f9f6 37%,#eef0ec 63%); background-size:400% 100%; animation: shimmer 1.4s infinite; border-radius:14rpx; }
+@keyframes shimmer { 0% {background-position:100% 50%} 100% {background-position:0 50%} }

@@ -1,0 +1,18 @@
+services:
+  api:
+    build: ./backend
+    ports:
+      - "8080:8080"
+    environment:
+      DB_HOST: ${DB_HOST:?请在环境变量中设置 DB_HOST}
+      DB_PORT: ${DB_PORT:-3306}
+      DB_NAME: ${DB_NAME:-deal_manager}
+      DB_USERNAME: ${DB_USERNAME:-root}
+      DB_PASSWORD: ${DB_PASSWORD:?请在环境变量中设置 DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET:?请在环境变量中设置 JWT_SECRET}
+      WECHAT_APP_ID: ${WECHAT_APP_ID:-}
+      WECHAT_APP_SECRET: ${WECHAT_APP_SECRET:-}
+      SERVER_PORT: 8080
+    volumes:
+      - ./backend/ai-models.json:/app/ai-models.json:ro
+    restart: unless-stopped

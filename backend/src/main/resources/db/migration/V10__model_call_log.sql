@@ -1,0 +1,28 @@
+-- Intentionally no foreign keys: independent log transactions must not wait on business user row locks.
+CREATE TABLE IF NOT EXISTS model_call_log (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    invocation_id VARCHAR(36) NOT NULL,
+    request_id VARCHAR(36),
+    user_id BIGINT,
+    entry_point VARCHAR(255) NOT NULL,
+    action VARCHAR(64),
+    provider VARCHAR(128),
+    model VARCHAR(255),
+    attempt INT NOT NULL,
+    status VARCHAR(16) NOT NULL,
+    input_text LONGTEXT COMMENT 'Actual HTTP request JSON',
+    output_text LONGTEXT COMMENT 'Raw HTTP response',
+    response_content LONGTEXT,
+    http_status INT,
+    token_usage INT,
+    error_reason VARCHAR(64),
+    error_type VARCHAR(128),
+    started_at DATETIME(6) NOT NULL,
+    finished_at DATETIME(6) NOT NULL,
+    duration_ms BIGINT NOT NULL,
+    INDEX idx_model_call_log_started(started_at),
+    INDEX idx_model_call_log_invocation(invocation_id, attempt),
+    INDEX idx_model_call_log_request(request_id, started_at),
+    INDEX idx_model_call_log_action(action, started_at),
+    INDEX idx_model_call_log_user(user_id, started_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

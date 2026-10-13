@@ -1,0 +1,16 @@
+.idea/
+.vscode/
+*.iml
+backend/target/
+backend/ai-models*.json
+.env
+*.env
+*.env.*
+**/.env
+**/.env.*
+miniprogram/miniprogram_npm/
+miniprogram/node_modules/
+project.private.config.json
+*.log
+backend/logs/
+logs/

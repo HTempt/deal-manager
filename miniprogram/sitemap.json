@@ -1,0 +1,4 @@
+{
+  "desc": "跟客 sitemap",
+  "rules": [{ "action": "allow", "page": "*" }]
+}
